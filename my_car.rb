@@ -27,6 +27,10 @@ class MyCar
     @current_speed = 0
     puts "Parking."
   end
+
+  def spray_paint(choice)
+    self.color = choice
+  end
 end
 
 camry = MyCar.new(2007, "grey", "Toyota Camry")
@@ -40,4 +44,8 @@ camry.current_speed
 camry.color = "grey"
 puts camry.color
 puts camry.year
+
+puts camry.color
+camry.spray_paint("black)
+puts camry.color
 
