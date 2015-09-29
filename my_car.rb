@@ -31,6 +31,10 @@ class MyCar
   def spray_paint(choice)
     self.color = choice
   end
+
+  def self.gas_mileage(amount, distance)
+    puts "Mileage is: #{distance/amount}"
+  end
 end
 
 camry = MyCar.new(2007, "grey", "Toyota Camry")
@@ -46,6 +50,10 @@ puts camry.color
 puts camry.year
 
 puts camry.color
-camry.spray_paint("black)
+camry.spray_paint("black")
 puts camry.color
+
+MyCar.gas_mileage(500, 15)
+
+
 
