@@ -1,4 +1,6 @@
 class MyCar
+  attr_accessor :color
+  attr_reader :year
 
   def initialize(year, color, model)
     @year = year
@@ -34,4 +36,8 @@ camry.brake(15)
 camry.current_speed
 camry.shut_off
 camry.current_speed
+
+camry.color = "grey"
+puts camry.color
+puts camry.year
 
