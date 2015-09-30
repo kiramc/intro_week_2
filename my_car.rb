@@ -35,6 +35,10 @@ class MyCar
   def self.gas_mileage(amount, distance)
     puts "Mileage is: #{distance/amount}"
   end
+
+  def to_s
+     "This car is a #{year} #{color} #{@model}."
+  end
 end
 
 camry = MyCar.new(2007, "grey", "Toyota Camry")
@@ -55,5 +59,6 @@ puts camry.color
 
 MyCar.gas_mileage(500, 15)
 
+puts camry
 
 
