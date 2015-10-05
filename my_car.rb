@@ -1,6 +1,24 @@
-class MyCar
-  attr_accessor :color
-  attr_reader :year
+module Towable
+  def can_tow?(pounds)
+    pounds < 2000 ? true : false
+  end
+end
+
+class Vehicle
+
+  @@number_of_vehicles = 0
+
+  def self.number_of_vehicles
+    puts "This program has created #{@@number_of_vehicles} vehicles."
+  end
+
+  def initialize 
+    @@number_of_vehicles += 1
+  end
+  
+  def self.gas_mileage(amount, distance)
+    puts "Mileage is: #{distance/amount}"
+  end
 
   def initialize(year, color, model)
     @year = year
@@ -32,14 +50,33 @@ class MyCar
     self.color = choice
   end
 
-  def self.gas_mileage(amount, distance)
-    puts "Mileage is: #{distance/amount}"
+  def age
+    "Your #{self.model} is #{years_old} years old."
   end
+
+  private
+
+  def calculate_age
+    Time.now.year - self.year
+  end
+
+end
+
+class MyCar < Vehicle
+  attr_accessor :color
+  attr_reader :year
 
   def to_s
      "This car is a #{year} #{color} #{@model}."
   end
 end
+
+class MyTruck < Vehicle
+  include Towable
+
+  DOORS = 2
+end
+
 
 camry = MyCar.new(2007, "grey", "Toyota Camry")
 camry.speed_up(20)
@@ -59,8 +96,13 @@ puts camry.color
 
 MyCar.gas_mileage(500, 15)
 
-puts camry
+puts camry.age
 
+puts Vehicle.number_of_vehicles
+
+puts MyCar.ancestors
+puts MyTruck.ancestors
+puts Vehicle.ancestors
 
 
 
