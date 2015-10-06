@@ -1,0 +1,43 @@
+[1]
+1. object -- boolean
+2. object -- string
+3. object -- array
+4. object -- number
+
+you can find out what type of object something is using .class
+
+[2]
+under each class: include Speed
+to check: try it and see if it works!
+
+[3]
+using self.class
+
+[4]
+class AngryCat
+  def hiss
+    puts "Hisssssss!!"
+  end
+end
+
+salem = AngryCat.new
+
+
+[5]
+@ indicates an instance variable
+can also list using .instance_variables
+
+[6]
+attr_accessor
+
+[7]
+default will be the class and encoding of the object ID
+
+[8]
+references the instance
+
+[9]
+references the class itself (a class method)
+
+[10]
+Bag.new(color, material)
