@@ -3,8 +3,8 @@ class Hand
 
   attr_reader :value
 
-  def initialize(choice)
-    @value = choice
+  def initialize(v)
+    @value = v
   end
 
   def <=> (another_hand)
@@ -29,26 +29,14 @@ class Hand
       puts "Scissors shred paper."
     end
   end
+
 end
 
-class Player
+class Human < Hand
   attr_accessor :hand
   attr_reader :name
 
   def initialize(name)
-    @name = name
-  end
-
-  def to_s
-    "#{name} chose #{self.hand.value}."
-  end
-end
-
-class Human
-  attr_reader :name
-  attr_accessor :hand
-
-  def initialize
     puts "What's your name?"
     @name = gets.chomp
   end
@@ -58,40 +46,37 @@ class Human
   end
 
   def pick_hand
-    until Game::CHOICES.keys.include?(c) do
-      puts "Pick one: (r, p, s):"
-      c = gets.chomp.downcase
+    loop do
+      puts "Choose one: Rock (r), Paper (p), or Scissors (s)."
+      player_choice = gets.chomp.downcase
+      if Game::CHOICES.keys.include?(player_choice)
+        # puts "You chose #{Game::CHOICES[player_choice]}."
+        puts self.to_s
+        break
+      else
+        puts "That is not a valid selection!"
+      end
+    self.hand = Hand.new(player_choice)
     end
-
-
-
-    # loop do
-    #   puts "Choose one: Rock (r), Paper (p), or Scissors (s)."
-    #   player_choice = gets.chomp.downcase
-    #   if Game::CHOICES.keys.include?(player_choice)
-    #     puts "You chose #{Game::CHOICES[player_choice]}."
-    #     break
-    #   else
-    #     puts "That is not a valid selection!"
-    #   end
-    # end
-    self.hand = Hand.new(c)
   end   
+
 end
 
-class Computer
-  attr_accessor :name, :hand
+class Computer < Hand
+  attr_accessor :hand
+  attr_reader :name
 
-  def initialize
+  def initialize(name)
     @name = "Computer"
   end
 
   def to_s
-    "Computer got #{choice}."
+    "Computer chose #{Game::CHOICES[self.hand.value]}."
   end
 
   def pick_hand
     self.hand = Hand.new(Game::CHOICES.keys.sample)
+    puts self.to_s
   end
 end
 
@@ -101,8 +86,8 @@ class Game
   attr_reader :player, :computer
 
   def initialize
-    @player = Human.new
-    @computer = Computer.new
+    @player = Human.new("Kira")
+    @computer = Computer.new("R2D2")
   end
 
   def compare_hands
@@ -113,10 +98,9 @@ class Game
       puts "#{player.name} wins!"
     else
       computer.hand.display_winning_message
-      puts "Computer wins!"
+      puts "#{computer.name} wins!"
     end
   end
-
 
   def play
     player.pick_hand
