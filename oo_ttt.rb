@@ -19,11 +19,9 @@ require 'pry'
 class Board
   attr_accessor :board
 
-  POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
   def initialize
-    @board = {}
-    (1..9).each { |position| position = board[position] = " " }
+    self.board = {}
+    (1..9).each { |position| position = self.board[position] = " " }
   end
 
   def draw
@@ -39,53 +37,89 @@ class Board
     board.select { |position, status| status = " " }.keys
   end
 
-  def to_s(index)
-    board[index].key
-  end
-
-
-
-
-binding.pry
-
-
 end
 
 class Player
-  def choose_marker
-    markers = ['x', 'o']
-    puts "Do you want to be X or O?"
-    player_marker = gets.chomp.downcase
+  attr_reader :player_marker, :name
+  attr_accessor :markers
+
+  def initialize
+    puts "Welcome to Tic Tac Toe! What's your name?"
+    @name = gets.chomp
+    @positions_occupied = []
+  end
+
+  def chooses_marker
+    @markers = ['x', 'o']
+    puts "Do you want to be 'X' or 'O'?"
+    @player_marker = gets.chomp.downcase
+    self.markers = self.markers.delete(player_marker)
   end
 
   def chooses_position
     puts "Choose an available position."
-    @player_choice = gets.chomp.to_i
+    player_choice = gets.chomp.to_i
+    if board.empty_positions.include?(player_choice)
+      positions_occupied << player_choice
+      board[player_choice] = self.player_marker
+    else
+      puts "That's not a valid selection!"
+    end
   end
 
-  def places_piece
-    positions_marked = []
-    @player_choice << positions_marked
-  end
 end
 
-class Computer
-end
+# class Computer
+#   attr_reader :name
 
-class Marker
-  MARKERS = ['x', 'o']
+#   def initialize(name)
+#     @name = name
 
-  def choose_marker
-    puts 
-  end
-end
+
+
+
+# __________________________________________________________________
+
+
+
+# class Player
+  
+#   def initialize
+#     puts "Welcome to Tic Tac Toe! What's your name?"
+#     @name = gets.chomp
+#     puts "Do you want to be 'X' or 'O'?"
+#     @piece = gets.chomp
+#     @positions_occupied = []
+#   end
+
+#   def chooses_position
+#     puts "Choose an available position."
+#     player_choice = gets.chomp.to_i
+#   end
+
+#   def places_piece
+#     positions_marked = []
+#     player_choice << positions_marked
+#   end
+# end
+
+# class Computer
+# end
+
+# class Marker
+#   MARKERS = ['x', 'o']
+
+#   def choose_marker
+#     puts 
+#   end
+# end
 
 class Game
   attr_accessor :board
 
   def initialize
     @human = Player.new
-    @computer = Computer.new
+    # @computer = Computer.new("R2D2")
     @board = Board.new
     @current_player = @human
   end
@@ -95,7 +129,10 @@ class Game
     puts "Welcome to Tic Tac Toe!"
     board.draw
     p board.empty_positions
-    @current_player.places_piece
+    @human.chooses_marker
+    @human.choose
+
+    
 
   end
 
