@@ -17,24 +17,55 @@
 require 'pry'
 
 class Board
+  attr_accessor :board
+
+  POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
   def initialize
     @board = {}
-    (1..9).each { |position| position = @board[position] = " " }
+    (1..9).each { |position| position = board[position] = " " }
   end
 
-  def list_empty_positions
-    @board.select { |position, status| status = " " }.keys
+  def draw
+    system "clear"
+    puts " #{board[1]} | #{board[2]} | #{board[3]} "
+    puts "---+---+---"
+    puts " #{board[4]} | #{board[5]} | #{board[6]}"
+    puts "---+---+---"
+    puts " #{board[7]} | #{board[8]} | #{board[9]}"    
+  end
+  
+  def empty_positions
+    board.select { |position, status| status = " " }.keys
+  end
+
+  def to_s(index)
+    board[index].key
   end
 
 
+
+
+binding.pry
 
 
 end
 
 class Player
-  def places_piece
+  def choose_marker
+    markers = ['x', 'o']
+    puts "Do you want to be X or O?"
+    player_marker = gets.chomp.downcase
+  end
+
+  def chooses_position
     puts "Choose an available position."
-    player_choice = gets.chomp.to_i
+    @player_choice = gets.chomp.to_i
+  end
+
+  def places_piece
+    positions_marked = []
+    @player_choice << positions_marked
   end
 end
 
@@ -42,9 +73,16 @@ class Computer
 end
 
 class Marker
+  MARKERS = ['x', 'o']
+
+  def choose_marker
+    puts 
+  end
 end
 
 class Game
+  attr_accessor :board
+
   def initialize
     @human = Player.new
     @computer = Computer.new
@@ -55,7 +93,8 @@ class Game
   def play
     
     puts "Welcome to Tic Tac Toe!"
-    puts @board.list_empty_positions
+    board.draw
+    p board.empty_positions
     @current_player.places_piece
 
   end
