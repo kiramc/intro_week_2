@@ -49,12 +49,6 @@ class Player
     @positions_occupied = []
   end
 
-  def chooses_marker
-    @markers = ['x', 'o']
-    puts "Do you want to be 'X' or 'O'?"
-    @player_marker = gets.chomp.downcase
-    self.markers = self.markers.delete(player_marker)
-  end
 
   def chooses_position
     puts "Choose an available position."
