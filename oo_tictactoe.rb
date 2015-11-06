@@ -17,8 +17,7 @@ class Game
   def wants_to_play_again?
     puts "Do you want to play again? (y/n)"
     answer = gets.chomp.downcase
-    return true if answer == "y"
-    nil
+    answer == "y"
   end
 
   def reset
@@ -34,17 +33,17 @@ class Game
     @computer.gets_marker(@human.marker)
     reset
       
-      loop do
-        @current_player.chooses_square_on(@board)
-        if @board.three_in_a_row?(@current_player.marker)
-          puts "#{@current_player.name} wins!"
-          wants_to_play_again? ? reset : break
-        elsif @board.available_positions.empty?
-          puts "It's a tie!"
-          wants_to_play_again? ? reset : break
-        else
-          alternate_player
-        end
+    loop do
+      @current_player.chooses_square_on(@board)
+      if @board.three_in_a_row?(@current_player.marker)
+        puts "#{@current_player.name} wins!"
+        wants_to_play_again? ? reset : break
+      elsif @board.available_positions.empty?
+        puts "It's a tie!"
+        wants_to_play_again? ? reset : break
+      else
+        alternate_player
+      end
       
       end
   end
@@ -63,11 +62,13 @@ class Human < Player
   def chooses_square_on(board)
     puts "Pick an available square:"
     player_choice = gets.chomp.to_i
-      loop do
-        break if board.available_positions.include?(player_choice)
-        puts "That's an invalid selection! Choose from the available options."
-        player_choice = gets.chomp.to_i
-      end
+
+    loop do
+      break if board.available_positions.include?(player_choice)
+      puts "That's an invalid selection! Choose from the available options."
+      player_choice = gets.chomp.to_i
+    end
+
     board[player_choice] = @marker
     board.draw
   end
@@ -106,7 +107,7 @@ class Computer < Player
 end
 
 class Board
-WINNING_LINES = [[1,2,3], [4,5,6], [7,8,9], [1,4,7], [2,5,8], [3,6,9], [1,5,9], [3,5,7]]
+  WINNING_LINES = [[1,2,3], [4,5,6], [7,8,9], [1,4,7], [2,5,8], [3,6,9], [1,5,9], [3,5,7]]
 
   def initialize
     @data = {}
@@ -125,12 +126,12 @@ WINNING_LINES = [[1,2,3], [4,5,6], [7,8,9], [1,4,7], [2,5,8], [3,6,9], [1,5,9], 
   end
 
   def draw
-  system "clear"
-  puts " #{display(1)} | #{display(2)} | #{display(3)}"
-  puts "---+---+---"
-  puts " #{display(4)} | #{display(5)} | #{display(6)}"
-  puts "---+---+---"
-  puts " #{display(7)} | #{display(8)} | #{display(9)}"
+    system "clear"
+    puts " #{display(1)} | #{display(2)} | #{display(3)}"
+    puts "---+---+---"
+    puts " #{display(4)} | #{display(5)} | #{display(6)}"
+    puts "---+---+---"
+    puts " #{display(7)} | #{display(8)} | #{display(9)}"
   end
 
   def [](position)
@@ -147,9 +148,9 @@ WINNING_LINES = [[1,2,3], [4,5,6], [7,8,9], [1,4,7], [2,5,8], [3,6,9], [1,5,9], 
 
   def three_in_a_row?(marker)
     WINNING_LINES.each do |line|
-    return true if @data.values_at(*line).count(marker) == 3
+      return true if @data.values_at(*line).count(marker) == 3
     end
-    nil
+    false
   end
 end
 
