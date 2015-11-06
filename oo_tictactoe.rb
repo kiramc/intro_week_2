@@ -1,5 +1,3 @@
-require 'pry'
-
 class Game
   def initialize
     @human = Human.new
@@ -59,12 +57,6 @@ class Player
     @name = "Computer"
     @marker = nil
   end
-
-  def ask_for_name
-    puts "What's your name?"
-    @name = gets.chomp
-  end
-
 end
 
 class Human < Player
@@ -78,6 +70,11 @@ class Human < Player
       end
     board[player_choice] = @marker
     board.draw
+  end
+
+  def ask_for_name
+    puts "What's your name?"
+    @name = gets.chomp
   end
 
   def chooses_marker
@@ -145,7 +142,7 @@ WINNING_LINES = [[1,2,3], [4,5,6], [7,8,9], [1,4,7], [2,5,8], [3,6,9], [1,5,9], 
   end
 
   def available_positions
-    @data.keys.select{ |position| @data[position] == " " }
+    @data.keys.select { |position| @data[position] == " " }
   end
 
   def three_in_a_row?(marker)

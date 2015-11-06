@@ -7,9 +7,9 @@ class Game
     @dealer = Dealer.new
   end
 
-  def start_new_game
+  def play
     @player.deal(@cards)
-    puts "@player.hand"
+    puts @player.hand
   end
 
 end
@@ -19,9 +19,7 @@ class Card
     @suit = suit
     @value = value
   end
-
 end
-
 
 class Deck
   attr_accessor :deck
@@ -74,4 +72,4 @@ include Hand
 
 end
 
-Game.new.start_new_game
+Game.new.play
