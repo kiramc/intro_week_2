@@ -9,12 +9,49 @@ class Game
     @dealer = Dealer.new
   end
 
-  def play
-    2.times { player.deal(cards.one_card) }
-    2.times { dealer.deal(cards.one_card) }
-    puts player.hand
+  def reset
+    cards.reset
+    player.reset
+    dealer.reset
 
   end
+
+  def play
+    reset
+    initial_deal
+    
+    puts "The dealer has: #{dealer.show_cards} for a total of #{dealer.calculate_total}."
+    puts "You have: #{player.show_cards} for a total of #{player.calculate_total}."
+
+    first_check
+    wants_to_play_again? ? play : exit
+
+  end
+
+  def initial_deal
+    2.times { player.deal(cards.one_card) }
+    2.times { dealer.deal(cards.one_card) }
+  end
+
+  def first_check
+    if dealer.calculate_total == 21
+      puts "Whoa that's lucky! Dealer hit blackjack, sorry. Game over."
+      wants_to_play_again? ? reset : exit
+    elsif player.calculate_total == 21
+      puts "Whoa that's lucky! You hit blackjack. Congratulations, you win!"
+      wants_to_play_again? ? reset : exit
+    end
+  end
+
+  def wants_to_play_again?
+    puts "Do you want to play again? (y/n)"
+    answer = gets.chomp
+    answer == "y"
+  end
+
+
+
+
 
 
 end
@@ -37,6 +74,9 @@ class Deck
   def initialize
     @suits = %w(♣ ♥ ♠ ♦)
     @values = %w(2 3 4 5 6 7 8 9 10 J K Q A)
+  end
+
+  def reset
     @deck = suits.product(values)
     deck.shuffle!
   end
@@ -66,12 +106,23 @@ attr_accessor :hand
       else
         total += face.to_i
       end
+    end
 
       #correct for aces
-      array_of_faces.count { |face| face == "A" }.times do
-        total -= 10 if total > 21
-      end
+    array_of_faces.count { |face| face == "A" }.times do
+      total -= 10 if total > 21
+    end
+    total
   end
+
+  def show_cards
+    hand.map { |pair| "#{pair[1]}#{pair[0]}" }.join(", ")
+  end
+
+  def reset
+    hand = []
+  end
+
 end
 
 
