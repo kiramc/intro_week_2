@@ -1,59 +1,123 @@
 require 'pry'
 
 class Game
-  attr_reader :player, :dealer, :cards
+  attr_reader :player, :dealer, :deck
 
   def initialize
-    @cards = Deck.new
+    @deck = Deck.new
     @player = Player.new
     @dealer = Dealer.new
-  end
-
-  def reset
-    cards.reset
-    player.reset
-    dealer.reset
-
+    puts "Welcome to blackjack!"
   end
 
   def play
     reset
     initial_deal
-    
-    puts "The dealer has: #{dealer.show_cards} for a total of #{dealer.calculate_total}."
-    puts "You have: #{player.show_cards} for a total of #{player.calculate_total}."
-
+    show_initial_hands
     first_check
-    wants_to_play_again? ? play : exit
-
+    players_turn
+    dealers_turn
+    compare_hands
+  end
+ 
+  def reset
+    deck.reset
+    player.reset
+    dealer.reset
   end
 
   def initial_deal
-    2.times { player.deal(cards.one_card) }
-    2.times { dealer.deal(cards.one_card) }
+    2.times { player.deal(deck.one_card) }
+    2.times { dealer.deal(deck.one_card) }
+  end
+
+  def show_initial_hands
+    puts "The dealer has: #{dealer.show_cards} for a total of #{dealer.calculate_total}."
+    puts "You have: #{player.show_cards} for a total of #{player.calculate_total}."
   end
 
   def first_check
     if dealer.calculate_total == 21
       puts "Whoa that's lucky! Dealer hit blackjack, sorry. Game over."
-      wants_to_play_again? ? reset : exit
+      wants_to_play_again?
     elsif player.calculate_total == 21
       puts "Whoa that's lucky! You hit blackjack. Congratulations, you win!"
-      wants_to_play_again? ? reset : exit
+      wants_to_play_again?
     end
+  end
+
+  def check_player_hand
+    if player.hit_blackjack?
+      puts "Congratulations! You hit blackjack, you win."
+      wants_to_play_again?
+    elsif player.is_busted?
+      puts "Oh no! Looks like you busted. Sorry, you lose."
+      wants_to_play_again?
+    end
+  end
+
+  def check_dealer_hand
+    if dealer.hit_blackjack?
+      puts "Oh no! Dealer hit blackjack. Sorry, you lose."
+      wants_to_play_again?
+    elsif dealer.is_busted?
+      puts "Dealer busts! Congratulations, you win."
+      wants_to_play_again?
+    end
+  end
+
+  def players_turn
+    while player.calculate_total < 21
+      puts "Do you want to hit ('h') or stay ('s')?"
+      hit_or_stay = gets.chomp
+      
+      if hit_or_stay == 'h'
+        player.deal(deck.one_card)
+        puts "You chose hit. Your new card is #{player.hand.last[1]}#{player.hand.last[0]}, for a total of #{player.calculate_total}."
+        check_player_hand
+      elsif hit_or_stay == 's'
+        puts "You chose to stay with a total of #{player.calculate_total}.\nNow for the dealer's turn."
+        break
+      else
+        puts "That's an invalid selection. Choose 'h' to hit, 's' to stay."
+      end
+    end
+  end
+
+  def dealers_turn
+    while dealer.calculate_total < 17
+      puts "Dealing the dealer another card..."
+      dealer.deal(deck.one_card)
+      puts "Dealer's new card is #{dealer.hand.last[1]}#{dealer.hand.last[2]}, for a total of #{dealer.calculate_total}."
+      check_dealer_hand
+    end
+  end
+
+  def compare_hands
+    puts "Dealer stays with #{dealer.show_cards}, for a total of #{dealer.calculate_total}."
+    
+    if player.calculate_total > dealer.calculate_total
+      puts "Congratulations! You win!"
+    elsif player.calculate_total < dealer.calculate_total
+      puts "Oh no, looks like dealer wins. Maybe next time."
+    else
+      puts "It's a tie!"
+    end
+
+    wants_to_play_again?
   end
 
   def wants_to_play_again?
     puts "Do you want to play again? (y/n)"
     answer = gets.chomp
-    answer == "y"
+    if answer == 'y'
+      puts "Great! Setting up new game ..."
+      play
+    else
+      puts "Thanks for playing! Goodbye."
+      exit
+    end
   end
-
-
-
-
-
-
 end
 
 class Card
@@ -84,11 +148,10 @@ class Deck
   def one_card
     deck.pop
   end
-
 end
 
 module Hand
-attr_accessor :hand
+  attr_accessor :hand
 
   def deal(card)
     hand << card
@@ -108,7 +171,7 @@ attr_accessor :hand
       end
     end
 
-      #correct for aces
+    #correct for aces
     array_of_faces.count { |face| face == "A" }.times do
       total -= 10 if total > 21
     end
@@ -119,35 +182,35 @@ attr_accessor :hand
     hand.map { |pair| "#{pair[1]}#{pair[0]}" }.join(", ")
   end
 
-  def reset
-    hand = []
+  def is_busted?
+    calculate_total > 21
   end
 
-end
+  def hit_blackjack?
+    calculate_total == 21
+  end
 
+
+  def reset
+    @hand = []
+  end
+
+
+end
 
 class Player
-include Hand
+  include Hand
 
   def initialize
-    @name = "Kira"
-    @hand = []
   end
-
-
-
-
 end
 
+
 class Dealer
-include Hand
+  include Hand
 
   def initialize
-    @hand = []
   end
-
-
-
 end
 
 Game.new.play
