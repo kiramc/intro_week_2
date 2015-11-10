@@ -1,6 +1,8 @@
 require 'pry'
 
 class Game
+  attr_reader :player, :dealer, :cards
+
   def initialize
     @cards = Deck.new
     @player = Player.new
@@ -8,9 +10,12 @@ class Game
   end
 
   def play
-    @player.deal(@cards)
-    puts @player.hand
+    2.times { player.deal(cards.one_card) }
+    2.times { dealer.deal(cards.one_card) }
+    puts player.hand
+
   end
+
 
 end
 
@@ -19,22 +24,24 @@ class Card
     @suit = suit
     @value = value
   end
+
+  def display
+    puts "The #{value} of #{suit}"
+  end
 end
 
 class Deck
+  attr_reader :suits, :values
   attr_accessor :deck
 
   def initialize
-    @deck = []
-    %w(♣ ♥ ♠ ♦).each do |suit|
-      %w(2 3 4 5 6 7 8 9 10 J K Q A).each do |value|
-        @deck << Card.new(suit, value)
-      end
-    end
+    @suits = %w(♣ ♥ ♠ ♦)
+    @values = %w(2 3 4 5 6 7 8 9 10 J K Q A)
+    @deck = suits.product(values)
     deck.shuffle!
   end
 
-  def deal_one
+  def one_card
     deck.pop
   end
 
@@ -43,12 +50,27 @@ end
 module Hand
 attr_accessor :hand
 
-  def initialize
-    @hand = []
+  def deal(card)
+    hand << card
   end
 
-  def deal(cards)
-    hand += (cards.deal_one)
+  def calculate_total
+    array_of_faces = hand.map { |pair| pair[1] }
+    total = 0
+
+    array_of_faces.each do |face|
+      if face == "A"
+        total += 11
+      elsif ["J", "Q", "K"].include?(face)
+        total += 10
+      else
+        total += face.to_i
+      end
+
+      #correct for aces
+      array_of_faces.count { |face| face == "A" }.times do
+        total -= 10 if total > 21
+      end
   end
 end
 
@@ -57,18 +79,23 @@ class Player
 include Hand
 
   def initialize
-    puts "Welcome to blackjack! What's your name?"
-    @name = gets.chomp
-   
+    @name = "Kira"
+    @hand = []
   end
+
+
+
+
 end
 
 class Dealer
 include Hand
 
   def initialize
- 
+    @hand = []
   end
+
+
 
 end
 
