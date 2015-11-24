@@ -1,0 +1,28 @@
+1. 
+- local variable
+- instance variable
+- new instance of user
+- calling the user's name method (getting it)
+- setting the user's name to Joe
+
+2. "include (ModuleName)
+
+3. class variables apply to every instance of a class, instance variables apply only to a particular instance of a class
+
+4. creates getter and setter for methods for each :__ that comes after it
+
+5. calling some_method on the class Dog
+
+6. subclassing is hierarchical (each class can have only one direct parent class) and mixing in modules is horizontal (a class can have any number of modules included in it)
+
+7. 
+def initialize(name)
+  @name = name
+end
+
+8. yes
+
+9. require 'pry', binding.pry at the point you want to break the program
+
+
+

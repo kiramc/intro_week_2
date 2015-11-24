@@ -1,162 +1,175 @@
+require 'pry'
+
 class Game
   attr_reader :player, :dealer, :deck
 
   def initialize
     @deck = Deck.new
-    @player = Player.new
-    @dealer = Dealer.new
-    puts "Welcome to blackjack!"
+    @player = Hand.new('Player')
+    @dealer = Hand.new('Dealer')
+    say "Welcome to blackjack!\n"
   end
 
   def play
     reset
     initial_deal
-    show_initial_hands
-    first_check
+    say show_initial_hands
+    say first_check
     players_turn
     dealers_turn
     compare_hands
   end
- 
-  def reset
+
+  def say(message) #"views" method
+    if message.is_a?(String)
+      message.length.times do |character|
+        print message[character]
+        sleep 0.02
+      end
+    else
+      return
+    end
+  end
+
+  def reset #resets all data to initial values
     deck.reset
     player.reset
     dealer.reset
   end
 
-  def initial_deal
+  def initial_deal #gives each player 2 cards
     2.times { player.deal(deck.one_card) }
     2.times { dealer.deal(deck.one_card) }
   end
 
-  def show_initial_hands
-    puts "The dealer has: #{dealer.show_cards} for a total of #{dealer.calculate_total}."
-    puts "You have: #{player.show_cards} for a total of #{player.calculate_total}."
+  def show_initial_hands #returns a string showing initial hands
+    "The dealer has: #{dealer.show_cards} for a total of #{dealer.calculate_total}.\nYou have: #{player.show_cards} for a total of #{player.calculate_total}.\n"
   end
 
   def first_check
     if dealer.calculate_total == 21
-      puts "Whoa that's lucky! Dealer hit blackjack, sorry. Game over."
-      wants_to_play_again?
+      "Whoa that's lucky! Dealer hit blackjack, sorry. Game over.\n"
     elsif player.calculate_total == 21
-      puts "Whoa that's lucky! You hit blackjack. Congratulations, you win!"
-      wants_to_play_again?
+      "Whoa that's lucky! You hit blackjack. Congratulations, you win!\n"
+    else
+      return
     end
   end
 
-  def check_player_hand
-    if player.hit_blackjack?
-      puts "Congratulations! You hit blackjack, you win."
-      wants_to_play_again?
-    elsif player.is_busted?
-      puts "Oh no! Looks like you busted. Sorry, you lose."
-      wants_to_play_again?
+  def check(either) #checks if hand is busted or blackjack, returns a message
+    if either.hit_blackjack?
+      "#{either.name} wins.\n"
+    elsif either.is_busted?
+      "#{either.name} busted!"
+    else
+      return #'stay' message should go here
     end
-  end
-
-  def check_dealer_hand
-    if dealer.hit_blackjack?
-      puts "Oh no! Dealer hit blackjack. Sorry, you lose."
-      wants_to_play_again?
-    elsif dealer.is_busted?
-      puts "Dealer busts! Congratulations, you win."
-      wants_to_play_again?
-    end
+    wants_to_play_again?
   end
 
   def players_turn
-    while player.calculate_total < 21
-      puts "Do you want to hit ('h') or stay ('s')?"
-      hit_or_stay = gets.chomp
-      
-      if hit_or_stay == 'h'
+    until player.is_busted?
+      say "Do you want to hit ('h') or stay ('s')?\n"
+        choice = gets.chomp
+      if choice == 'h'
         player.deal(deck.one_card)
-        puts "You chose hit. Your new card is #{player.hand.last[1]}#{player.hand.last[0]}, for a total of #{player.calculate_total}."
-        check_player_hand
-      elsif hit_or_stay == 's'
-        puts "You chose to stay with a total of #{player.calculate_total}.\nNow for the dealer's turn."
-        break
+        say "You chose hit. Your new card is #{player.hand.last}, for a total of #{player.calculate_total}.\n"
+        say check(player)
+      elsif choice == 's'
+        say "You chose to stay with a total of #{player.calculate_total}.\nNow for the dealer's turn.\n"
+        return
       else
-        puts "That's an invalid selection. Choose 'h' to hit, 's' to stay."
+        say "That's an invalid selection. Choose 'h' to hit, 's' to stay.\n"
       end
     end
   end
 
   def dealers_turn
     while dealer.calculate_total < 17
-      puts "Dealing the dealer another card..."
+      say "Dealing the dealer another card...............\n"
       dealer.deal(deck.one_card)
-      puts "Dealer's new card is #{dealer.hand.last[1]}#{dealer.hand.last[2]}, for a total of #{dealer.calculate_total}."
-      check_dealer_hand
+      say "Dealer's new card is #{dealer.hand.last}, for a total of #{dealer.calculate_total}.\n"
+      say check(dealer)
     end
+    "Dealer stays with #{dealer.show_cards}, for a total of #{dealer.calculate_total}.\n"
   end
 
-  def compare_hands
-    puts "Dealer stays with #{dealer.show_cards}, for a total of #{dealer.calculate_total}."
-    
+  def compare_hands    
     if player.calculate_total > dealer.calculate_total
-      puts "Congratulations! You win!"
+      "Congratulations! You win!\n"
     elsif player.calculate_total < dealer.calculate_total
-      puts "Oh no, looks like dealer wins. Maybe next time."
+      "Oh no, looks like dealer wins. Maybe next time.\n"
     else
-      puts "It's a tie!"
+      "It's a tie!\n"
     end
-
-    wants_to_play_again?
   end
 
   def wants_to_play_again?
-    puts "Do you want to play again? (y/n)"
+    say "Do you want to play again? (y/n)"
     answer = gets.chomp
     if answer == 'y'
-      puts "Great! Setting up new game ..."
+      say "Great! Setting up new game ..."
       play
     else
-      puts "Thanks for playing! Goodbye."
+      say "Thanks for playing! Goodbye.\n"
       exit
     end
   end
+
 end
 
 class Card
-  def initialize(suit, value)
-    @suit = suit
+  attr_reader :value, :suit
+
+  def initialize(value, suit)
     @value = value
+    @suit = suit
   end
 
-  def display
-    puts "The #{value} of #{suit}"
+  def to_s #returns a string showing the card
+    "#{value}#{suit}"
   end
 end
 
 class Deck
-  attr_reader :suits, :values
-  attr_accessor :deck
+  attr_accessor :cards
 
   def initialize
-    @suits = %w(♣ ♥ ♠ ♦)
-    @values = %w(2 3 4 5 6 7 8 9 10 J K Q A)
+    @cards = []
   end
 
-  def reset
-    @deck = suits.product(values)
-    deck.shuffle!
+  def reset #returns a deck of cards
+    %w(2 3 4 5 6 7 8 9 10 J K Q A).each do |value|
+      %w(♣ ♥ ♠ ♦).each do |suit|
+        cards << Card.new(value, suit)
+      end
+    end
+    cards.shuffle!    
   end
 
-  def one_card
-    deck.pop
+  def one_card #returns a new card
+    cards.pop
   end
 end
 
-module Hand
+class Hand
   attr_accessor :hand
+  attr_reader :name
 
-  def deal(card)
+  def initialize(name)
+    @name = name
+  end
+
+  def reset
+    @hand = []
+  end
+
+  def deal(card) #shovels a new card into the hand
     hand << card
   end
 
-  def calculate_total
-    array_of_faces = hand.map { |pair| pair[1] }
+  def calculate_total #returns hand total
+    array_of_faces = hand.map { |card| card.value }
     total = 0
 
     array_of_faces.each do |face|
@@ -176,38 +189,16 @@ module Hand
     total
   end
 
-  def show_cards
-    hand.map { |pair| "#{pair[1]}#{pair[0]}" }.join(", ")
+  def show_cards #returns string of cards in hand
+    hand.map { |card| card.to_s }.join(", ")
   end
 
-  def is_busted?
+  def is_busted? #returns true or false
     calculate_total > 21
   end
 
-  def hit_blackjack?
+  def hit_blackjack? #returns true or false
     calculate_total == 21
-  end
-
-
-  def reset
-    @hand = []
-  end
-
-
-end
-
-class Player
-  include Hand
-
-  def initialize
-  end
-end
-
-
-class Dealer
-  include Hand
-
-  def initialize
   end
 end
 
